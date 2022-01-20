@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.exceptions import NON_FIELD_ERRORS # для сообщений обо всей модели
@@ -37,7 +38,8 @@ class Bd(models.Model):
     price = models.FloatField(null=True, blank=True, verbose_name='Цена',
                               validators=[validate_even, MinMaxValueValidator(10, 10000000)])
     published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликовано')
-    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT, verbose_name='Рубрика')
+    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT, verbose_name='Рубрика',
+                               related_name='entries', related_query_name='entry')
 
     def __str__(self):
         return  self.title
@@ -47,6 +49,7 @@ class Bd(models.Model):
             return '%s (%.2f)' % (self.title, self.price)
         else:
             return self.title
+
     title_and_price.short_description = 'Название и цена'
 
     class Meta:
@@ -86,3 +89,8 @@ class Measure(models.Model):
         YARDS = 0.9144, 'Ярды'
 
     measurement = models.FloatField(choices=Measurement.choices)
+
+
+class AdvUser(models.Model):
+    is_activated = models.BooleanField(default=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
