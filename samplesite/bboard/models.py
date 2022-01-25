@@ -29,6 +29,13 @@ class MinMaxValueValidator:
 
 # Create your models here.
 class Bd(models.Model):
+    KINDS = (
+        (None, 'Выберите тип публикуемого объявления'),
+        ('b', 'Куплю'),
+        ('s', 'Продам'),
+        ('c', 'Обменяю'),
+    )
+
     title = models.CharField(max_length=50, verbose_name='Товар',
                              validators=[validators.RegexValidator(
                                  regex='^.{4,}$',
@@ -38,8 +45,11 @@ class Bd(models.Model):
     price = models.FloatField(null=True, blank=True, verbose_name='Цена',
                               validators=[validate_even, MinMaxValueValidator(10, 10000000)])
     published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликовано')
-    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT, verbose_name='Рубрика',
-                               related_name='entries', related_query_name='entry')
+    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT, verbose_name='Рубрика',)
+
+                               # related_name='entries', related_query_name='entry')
+
+    kind = models.CharField(max_length=1, choices=KINDS, blank=True)
 
     def __str__(self):
         return  self.title
@@ -73,6 +83,10 @@ class Bd(models.Model):
 class Rubric(models.Model):
     name = models.CharField(max_length=20, db_index=True, verbose_name='Название')
 
+    # create internet address of model entry - optionals
+    def get_absolute_url(self):
+        return "/bboard/%s/" % self.pk
+
     def __str__(self):
         return self.name
 
@@ -80,6 +94,21 @@ class Rubric(models.Model):
         verbose_name_plural = 'Рубрики'
         verbose_name = 'Рубрика'
         ordering = ['name']
+            # index named 'bb_partial' includes products costs less than 10000 --don't work in mySQL
+            # indexes = [
+            #     models.Index(fields=['-published', 'title'], name='bd_partial', condition=models.Q(price_lte=10000))
+            # ]
+            #
+            # index_together = [
+            #     ['-published', 'title'],
+            #     ['title', 'price', 'rubric'],
+            # ]
+        # conditions for datas - price lays in range from 0 to 1 000 000
+        # if not accept condition - rise exception IntegrityError
+        constraints = (
+            models.CheckConstraint(check=models.Q(price_gte=0) & models.Q(price_lte=1000000),
+                                   name='bboard_rubric_price_constraint'),
+        )
 
 
 class Measure(models.Model):

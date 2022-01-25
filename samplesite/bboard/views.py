@@ -1,4 +1,7 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
+
 from .models import Bd, Rubric
 # IMPORT FOR FORMS
 from django.views.generic.edit import CreateView
@@ -31,3 +34,31 @@ class BdCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['rubrics'] = Rubric.objects.all()
         return context
+
+
+def add(request):
+    bbf = BdForm()
+    context = {'form': bbf}
+    return render(request, 'bboard/create.html', context)
+#
+#
+# def add_save(request):
+#     bbf = BdForm(request.POST)
+#     if bbf.is_valid():
+#         bbf.save()
+#         return HttpResponseRedirect(reverse('by_rubric', kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk}))
+#     else:
+#         context = {'form': bbf}
+#         return render(request, 'bboard/')
+
+
+def add_and_save(request):
+    if request.method == 'POST':
+        bbf = BdForm(request.POST)
+        if bbf.is_valid():
+            bbf.save()
+            return HttpResponseRedirect(reverse('bboard:by_rubric', kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk}))
+    else:
+        bbf = BdForm()
+        context = {'form': bbf}
+        return render(request, 'bboard/create.html', context)
