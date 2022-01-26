@@ -1,6 +1,8 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+
+
 
 from .models import Bd, Rubric
 # IMPORT FOR FORMS
@@ -12,8 +14,18 @@ from .forms import BdForm
 def index(request):
     bbs = Bd.objects.all()
     rubrics = Rubric.objects.all()
+
     context = {'bbs': bbs, 'rubrics': rubrics}
     return render(request, 'bboard/index.html', context)
+
+
+def detail(request, bb_id):
+    try:
+        bb = Bd.objects.get(pk=bb_id)
+        context = {'bbs': bb}
+    except Bd.DoesNotExist:
+        return HttpResponseNotFound('Такое объявление не существует')
+    return render(request, 'bboard/item.html', context)
 
 
 def by_rubric(request, rubric_id):
@@ -28,7 +40,8 @@ def by_rubric(request, rubric_id):
 class BdCreateView(CreateView):
     template_name = 'bboard/create.html'
     form_class = BdForm
-    success_url = '/bboard/'
+    # success_url = '/bboard/'
+    success_url = reverse_lazy('index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,16 +53,6 @@ def add(request):
     bbf = BdForm()
     context = {'form': bbf}
     return render(request, 'bboard/create.html', context)
-#
-#
-# def add_save(request):
-#     bbf = BdForm(request.POST)
-#     if bbf.is_valid():
-#         bbf.save()
-#         return HttpResponseRedirect(reverse('by_rubric', kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk}))
-#     else:
-#         context = {'form': bbf}
-#         return render(request, 'bboard/')
 
 
 def add_and_save(request):

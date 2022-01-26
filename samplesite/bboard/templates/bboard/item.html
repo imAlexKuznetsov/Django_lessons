@@ -1,0 +1,12 @@
+{% extends "layout/basic.html" %}
+
+{% block content %}
+
+      <div>
+        <h2>{{ bbs.title_and_price }}</h2>
+        <p>{{ bbs.content }}</p>
+        <p><a href="/bboard/{{bb.rubric.pk}}">{{bbs.rubric.name}}</a></p>{{bbs.price}}
+        <p>{{ bbs.published|date:"d.m.Y H:i:s" }}</p>
+      </div>
+
+{% endblock %}

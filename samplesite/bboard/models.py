@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import NON_FIELD_ERRORS # для сообщений обо всей модели
 from django.utils.deconstruct import deconstructible # для создания серилизации при миграци (мигр не раб с влож класс)
 
