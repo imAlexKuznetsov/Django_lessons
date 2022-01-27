@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index, by_rubric, add_and_save, detail,  add,  BdCreateView, BdByRubricView, BdDetailView
+from .views import index, by_rubric, add_and_save, detail,  add,  BdCreateView, BdByRubricView, BdDetailView, BdAddView
 
 
 app_name = 'bboard'
@@ -8,7 +8,8 @@ urlpatterns = [
     # path('<int:rubric_id>/', by_rubric, name='by_rubric'),
     # path('add/', add_and_save, name='add'),
     # path('add/save', add_save, name='add_save'),
-    path('add/', BdCreateView.as_view(), name='add'),
+    # path('add/', BdCreateView.as_view(), name='add'),
+    path('add/', BdAddView.as_view(), name='add'),
     path('<int:rubric_id>/', BdByRubricView.as_view(), name='by_rubric'),
     path('detail/<int:pk>/', BdDetailView.as_view(), name='detail'),
     path('', index, name='index'),

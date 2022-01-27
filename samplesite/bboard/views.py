@@ -93,6 +93,28 @@ class BdCreateView(CreateView):
         return context
 
 
+class BdAddView(FormView):
+    template_name = 'bboard/create.html'
+    form_class = BdForm
+    initial = {'price': 0.0}
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['rubric'] = Rubric.objects.all()
+        return context
+
+    def get_form(self, form_class=None):
+        self.object = super().get_form(form_class)
+        return self.object
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('bboard:by_rubric', kwargs={'rubric_id': self.object.cleaned_data['rubric'].pk})
+
+
 ##############################################     details      ####################################
 def detail(request, bb_id):
     try:
@@ -113,25 +135,3 @@ class BdDetailView(DetailView):
         context['rubrics'] = Rubric.objects.all()
         return context
 
-
-######################################### form view ###############################################
-class BdAddView(FormView):
-    template_name = 'bboard/create.html'
-    form_class = BdForm
-    initial = {'price': 0.0}
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['rubric'] = Rubric.objects.all()
-        return context
-
-    def form_valid(self, form):
-        form.save()
-        return super().fornm_valid(form)
-
-    def get_form(self, form_class=None):
-        self.object = super().get_form(form_class)
-        return self.object
-
-    def get_success_url(self):
-        return reverse('bboard:by_rubric', kwargs={'rubric_id': self.object.cleaned_data['rubric'].pk})
