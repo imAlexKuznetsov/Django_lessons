@@ -1,0 +1,13 @@
+{% extends "layout/basic.html" %}
+
+{% block title %} {{ bd.title }} {% endblock%}
+
+{% block content %}
+
+    <p> Рубрика: {{bd.rubric.name}}</p>
+    <h2>{{ bd.title }} </h2>
+    <p>{{bd.content}}</p>
+    <p>{{bd.price}}</p>
+    <p>{{ bd.published|date:"d.m.Y H:i:s" }}</p>
+
+{% endblock %}
