@@ -1,0 +1,17 @@
+{% extends "layout/basic.html" %}
+
+{% block title %} Удаление объявления {% endblock%}
+
+{% block content %}
+    <h2> Удаление объявления</h2>
+    <p> Рубрика: {{bd.rubric.name}}</p>
+    <h2>{{ bd.title }} </h2>
+    <p>{{bd.content}}</p>
+    <p>{{bd.price}}</p>
+    <p>{{ bd.published|date:"d.m.Y H:i:s" }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Подтвердить удаление объявления">
+    </form>
+
+{% endblock %}

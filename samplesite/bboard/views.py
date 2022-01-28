@@ -5,7 +5,7 @@ from django.urls import reverse, reverse_lazy
 
 from .models import Bd, Rubric
 # IMPORT FOR FORMS
-from django.views.generic.edit import CreateView, FormView
+from django.views.generic.edit import CreateView, FormView, UpdateView, DeleteView
 from .forms import BdForm
 
 
@@ -60,7 +60,7 @@ class BdByRubricView(TemplateView):
 """
 
 
-#############################################  add new items   ###########################################
+#############################################  add, edit, delete new items   ###########################################
 def add(request):
     bbf = BdForm()
     context = {'form': bbf}
@@ -79,7 +79,7 @@ def add_and_save(request):
         return render(request, 'bboard/create.html', context)
 
 
-# CONTROLLER-CLASS FORM
+# CONTROLLER-CLASS FORM ----------------------------------------------------------
 class BdCreateView(CreateView):
     template_name = 'bboard/create.html'
     form_class = BdForm
@@ -114,6 +114,35 @@ class BdAddView(FormView):
     def get_success_url(self):
         return reverse('bboard:by_rubric', kwargs={'rubric_id': self.object.cleaned_data['rubric'].pk})
 
+
+class BdEditView(UpdateView):
+    model = Bd
+    form_class = BdForm
+    template_name_suffix = '_edit'
+    # success_url = '/' # if don't want use get_success_url function
+
+    def get_success_url(self):
+        # print(dir(self.object))
+        return reverse('bboard:by_rubric', kwargs={'rubric_id': self.object.rubric.pk})
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['rubrics'] = Rubric.objects.all()
+        return context
+
+
+class BdDeleteView(DeleteView):
+    model = Bd
+    # success_url = '/'
+
+    def get_success_url(self):
+        # print(dir(self.object))
+        return reverse('bboard:by_rubric', kwargs={'rubric_id': self.object.rubric.pk})
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['rubrics'] = Rubric.objects.all()
+        return context
 
 ##############################################     details      ####################################
 def detail(request, bb_id):
